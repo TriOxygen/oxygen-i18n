@@ -4,7 +4,7 @@ Simple i18n on crack. uses string literals to achieve greatness.
 
 ## Example
 
-```jsx
+```javascript
 import React, { Component } from 'react';
 import { addMessages, translate as _l } from 'lib/I18n';
 
