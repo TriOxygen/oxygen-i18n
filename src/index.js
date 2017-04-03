@@ -1,19 +1,35 @@
+import React from 'react';
 const typeInfoRegex = /^:([a-z])(\((.+)\))?/;
 const messages = {};
 
+
 class I18N {
+  fallback = false;
 
   translate = (literals, ...values) => {
     const messageBundle = messages[this.locale];
     const translationKey = this._buildKey(literals);
-    const translationString = messageBundle[translationKey];
+    let translationString = messageBundle[translationKey];
 
+    if (this.fallback && !translationString) {
+      translationString = messages['en-US'][translationKey];
+    }
     if (translationString) {
+      let hasReact = false;
       const typeInfoForValues = literals.slice(1).map(this._extractTypeInfo);
-      const localizedValues = values.map((v, i) => this._localize(v, typeInfoForValues[i]));
+      const localizedValues = values.map((v, i) => {
+        if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
+          hasReact = true;
+          return v;
+        }
+        return this._localize(v, typeInfoForValues[i])
+      });
+      if (hasReact) {
+        return this._buildReact(translationString, ...localizedValues);
+      }
       return this._buildMessage(translationString, ...localizedValues);
     }
-    return 'Error: translation missing!';
+    return `${translationKey}[${this.locale}]`;
   };
 
   setLocale = (locale, defaultCurrency) => {
@@ -22,12 +38,17 @@ class I18N {
     this.defaultCurrency = defaultCurrency;
     this.dateTimeFormat = new Intl.DateTimeFormat(locale, {
       year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      second: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
       hour12: false
+    });
+    this.dateFormat = new Intl.DateTimeFormat(locale, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
     });
     this.setLocalizers();
     if (this.onChange) {
@@ -55,7 +76,8 @@ class I18N {
           maximumFractionDigits: fractionalDigits
         })
       ),
-      d: v => this.dateTimeFormat.format(v)
+      dt: v => this.dateTimeFormat.format(v),
+      d: v => this.dateFormat.format(v)
     };
   }
 
@@ -84,6 +106,18 @@ class I18N {
   // e.g. I18n._formatStrings('{0} {1}!', 'hello', 'world') == 'hello world!'
   _buildMessage(str, ...values) {
     return str.replace(/{(\d)}/g, (_, index) => values[Number(index)]);
+  }
+
+  _buildReact(str, ...values) {
+    const tokens = str.split(/({\d+})/).map(token => {
+      const match = token.match(/{(\d+)}/);
+      if (match) {
+        return values[Number(match[1])];
+      }
+      return token;
+    });
+    return React.createElement('span', {}, ...tokens);
+
   }
 }
 
