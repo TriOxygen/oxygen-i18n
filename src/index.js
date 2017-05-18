@@ -32,6 +32,14 @@ class I18N {
     return `${translationKey}[${this.locale}]`;
   };
 
+  currency = (v, currency) => {
+    const { locale, defaultCurrency } = this;
+    return v.toLocaleString(locale, {
+      style: 'currency',
+      currency: currency || defaultCurrency
+    })
+  };
+
   setLocale = (locale, defaultCurrency) => {
     this.locale = locale;
     messages[locale] = messages[locale] || {};
@@ -129,7 +137,7 @@ export function addMessages(messageBundles) {
 }
 
 const i18n = new I18N('en-US', 'EUR');
-const { translate, setLocale } = i18n;
+const { translate, setLocale, currency } = i18n;
 
-export { translate, setLocale };
+export { currency, translate, setLocale };
 export default i18n;
