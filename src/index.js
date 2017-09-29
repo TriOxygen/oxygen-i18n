@@ -21,6 +21,10 @@ class I18N {
         if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
           hasReact = true;
           return v;
+        } else if (typeof (v) === 'number' && typeInfoForValues[i].type == 's') {
+          if (typeof (v) == 'number') {
+            return this._localize(v, { type: 'n', options: '' });
+          }
         }
         return this._localize(v, typeInfoForValues[i])
       });
@@ -36,7 +40,7 @@ class I18N {
     const { locale, defaultCurrency } = this;
     return v.toLocaleString(locale, {
       style: 'currency',
-      currency: currency || defaultCurrency
+      currency: currency.replace('_', '-') || defaultCurrency
     })
   };
 
@@ -99,6 +103,7 @@ class I18N {
   }
 
   _localize(value, { type, options }) {
+    console.log(value, type, options)
     return this._localizers[type](value, options);
   }
 
@@ -137,7 +142,8 @@ export function addMessages(messageBundles) {
 }
 
 const i18n = new I18N('en-US', 'EUR');
+const _l = i18n.translate
 const { translate, setLocale, currency } = i18n;
 
-export { currency, translate, setLocale };
+export { currency, translate, _l, setLocale };
 export default i18n;
