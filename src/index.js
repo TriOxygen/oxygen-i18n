@@ -40,14 +40,22 @@ class I18N {
     const { locale, defaultCurrency } = this;
     return v.toLocaleString(locale, {
       style: 'currency',
-      currency: currency.replace('_', '-') || defaultCurrency
+      currency: (currency && currency.replace('_', '-')) || defaultCurrency
     })
   };
 
-  setLocale = (locale, defaultCurrency) => {
+  setCurrency = ( defaultCurrency) => {
+    this.locale = locale;
+    this.defaultCurrency = defaultCurrency;
+    if (this.onChange) {
+      this.onChange(locale, defaultCurrency);
+    }
+  }
+
+
+  setLocale = (locale) => {
     this.locale = locale;
     messages[locale] = messages[locale] || {};
-    this.defaultCurrency = defaultCurrency;
     this.dateTimeFormat = new Intl.DateTimeFormat(locale, {
       year: 'numeric',
       month: '2-digit',
@@ -79,7 +87,7 @@ class I18N {
       c /*currency*/: (v, currency) => (
         v.toLocaleString(locale, {
           style: 'currency',
-          currency: currency || defaultCurrency
+          currency: (currency && currency.replace('_', '-')) || defaultCurrency
         })
       ),
       n /*number*/: (v, fractionalDigits) => (
@@ -103,7 +111,6 @@ class I18N {
   }
 
   _localize(value, { type, options }) {
-    console.log(value, type, options)
     return this._localizers[type](value, options);
   }
 
