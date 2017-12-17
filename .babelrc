@@ -5,7 +5,5 @@
     ["stage-0"],
   ],
   "plugins": [
-    ["add-module-exports"],
-    ["transform-export-extensions"]
   ]
 }
