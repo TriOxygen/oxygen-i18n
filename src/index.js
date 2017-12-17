@@ -1,10 +1,33 @@
 import React from 'react';
-const typeInfoRegex = /^:([a-z])(\((.+)\))?/;
 const messages = {};
+const typeInfoRegex = /^:([a-z])(\(([^\)]+)\))?/
+const formatOptionNumeric = 'numeric';
+const formatOptionLong = 'long';
+const formatOption2Digit = '2-digit';
+const numberStyleDecimal = 'decimal';
+const numberStyleCurrency = 'currency';
+const numberStylePercent = 'percent';
+const defaultLocale = 'en-US';
+const defaultCurrency = 'EUR';
 
+const formatStrings = {
+  d: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionNumeric, day: formatOptionNumeric, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+  D: { weekday: formatOptionLong, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: formatOptionNumeric, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+  f: { weekday: formatOptionLong, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: formatOptionNumeric, hour: formatOptionNumeric, minute: formatOption2Digit, second: undefined, timeZoneName: undefined },
+  F: { weekday: formatOptionLong, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: formatOptionNumeric, hour: formatOptionNumeric, minute: formatOption2Digit, second: formatOption2Digit, timeZoneName: undefined },
+  g: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionNumeric, day: formatOptionNumeric, hour: formatOptionNumeric, minute: formatOption2Digit, second: undefined, timeZoneName: undefined },
+  G: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionNumeric, day: formatOptionNumeric, hour: formatOptionNumeric, minute: formatOption2Digit, second: formatOption2Digit, timeZoneName: undefined },
+  m: { weekday: undefined, era: undefined, year: undefined, month: formatOptionLong, day: formatOptionNumeric, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+  M: { weekday: undefined, era: undefined, year: undefined, month: formatOptionLong, day: formatOptionNumeric, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+  t: { weekday: undefined, era: undefined, year: undefined, month: undefined, day: undefined, hour: formatOptionNumeric, minute: formatOption2Digit, second: undefined, timeZoneName: undefined },
+  T: { weekday: undefined, era: undefined, year: undefined, month: undefined, day: undefined, hour: formatOptionNumeric, minute: formatOption2Digit, second: formatOption2Digit, timeZoneName: undefined },
+  y: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: undefined, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+  Y: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: undefined, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
+};
 
 class I18N {
   fallback = false;
+  currency = defaultCurrency;
 
   translate = (literals, ...values) => {
     const messageBundle = messages[this.locale];
@@ -36,73 +59,59 @@ class I18N {
     return `${translationKey}[${this.locale}]`;
   };
 
-  currency = (v, currency) => {
-    const { locale, defaultCurrency } = this;
-    return v.toLocaleString(locale, {
-      style: 'currency',
-      currency: (currency && currency.replace('_', '-')) || defaultCurrency
-    })
-  };
-
-  setCurrency = ( defaultCurrency) => {
+  setLocale = (locale, currency) => {
     this.locale = locale;
-    this.defaultCurrency = defaultCurrency;
-    if (this.onChange) {
-      this.onChange(locale, defaultCurrency);
-    }
-  }
-
-
-  setLocale = (locale) => {
-    this.locale = locale;
+    this.currency = currency;
     messages[locale] = messages[locale] || {};
-    this.dateTimeFormat = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false
-    });
-    this.dateFormat = new Intl.DateTimeFormat(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
     this.setLocalizers();
     if (this.onChange) {
-      this.onChange(locale, defaultCurrency);
+      this.onChange(locale, currency);
     }
   };
 
-  constructor(locale, defaultCurrency) {
-    this.setLocale(locale, defaultCurrency);
+  constructor(locale, currency) {
+    this.setLocale(locale, currency);
   }
 
   setLocalizers() {
-    const { locale, defaultCurrency } = this;
+    const { locale, currency } = this;
     this._localizers = {
-      s /*string*/: v => (v || '').toLocaleString(locale),
-      c /*currency*/: (v, currency) => (
-        v.toLocaleString(locale, {
-          style: 'currency',
-          currency: (currency && currency.replace('_', '-')) || defaultCurrency
-        })
-      ),
-      n /*number*/: (v, fractionalDigits) => (
-        v.toLocaleString(locale, {
-          minimumFractionDigits: fractionalDigits,
-          maximumFractionDigits: fractionalDigits
-        })
-      ),
-      dt: v => this.dateTimeFormat.format(v),
-      d: v => this.dateFormat.format(v)
+      s: v => { // string
+        return (v || '').toLocaleString(locale);
+      },
+      c: (v, alternateCurrency) => {
+        return v.toLocaleString(locale, {
+          style: numberStyleCurrency,
+          currency: alternateCurrency || currency,
+        });
+      },
+      n: (v, format) => {
+        return v.toLocaleString(locale, { style: numberStyleDecimal, minimumFractionDigits: 0, maximumFractionDigits: 3 });
+      },
+      t: (v, format) => {
+        if (format) {
+          switch (format.toUpperCase()) {
+            case 'R':
+              return v.toUTCString();
+            case 'O':
+              return v.toISOString();
+          }
+          const formatOptions = formatStrings[format];
+          if(formatOptions) {
+            return v.toLocaleString(locale, formatOptions);
+          }
+        }
+        return v.toLocaleString(locale, {});
+      },
+      p: (v) => {
+        return v.toLocaleString(locale, { style: numberStylePercent });
+      }
+
     };
   }
 
   _extractTypeInfo(literal) {
-    let match = typeInfoRegex.exec(literal);
+    const match = typeInfoRegex.exec(literal);
     if (match) {
       return { type: match[1], options: match[3] };
     } else {
@@ -114,16 +123,14 @@ class I18N {
     return this._localizers[type](value, options);
   }
 
-  // e.g. I18n._buildKey(['', ' has ', ':c in the']) == '{0} has {1} in the bank'
   _buildKey(literals) {
     let stripType = s => s.replace(typeInfoRegex, '');
     let lastPartialKey = stripType(literals[literals.length - 1]);
     let prependPartialKey = (memo, curr, i) => `${stripType(curr)}{${i}}${memo}`;
 
-    return literals.slice(0, -1).reduceRight(prependPartialKey, lastPartialKey);
+    return literals.slice(0, -1).reduceRight(prependPartialKey, lastPartialKey).replace(/\r\n/g, '\n');
   }
 
-  // e.g. I18n._formatStrings('{0} {1}!', 'hello', 'world') == 'hello world!'
   _buildMessage(str, ...values) {
     return str.replace(/{(\d)}/g, (_, index) => values[Number(index)]);
   }
@@ -148,9 +155,7 @@ export function addMessages(messageBundles) {
   });
 }
 
-const i18n = new I18N('en-US', 'EUR');
-const _l = i18n.translate
-const { translate, setLocale, currency } = i18n;
+const i18n = new I18N(defaultLocale, defaultCurrency);
 
-export { currency, translate, _l, setLocale };
-export default i18n;
+export const setLocale = i18n.setLocale;
+export default i18n.translate;
