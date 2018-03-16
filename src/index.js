@@ -157,5 +157,8 @@ export function addMessages(messageBundles) {
 
 const i18n = new I18N(defaultLocale, defaultCurrency);
 
+export const currency = (amount, currency) => i18n._localizers.c(amount, currency);
+
 export const setLocale = i18n.setLocale;
+export { i18n };
 export default i18n.translate;
