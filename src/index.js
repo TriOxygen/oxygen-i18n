@@ -61,7 +61,7 @@ class I18N {
 
   setLocale = (locale, currency) => {
     this.locale = locale;
-    this.currency = currency;
+    this.currency = this.currency || currency;
     messages[locale] = messages[locale] || {};
     this.setLocalizers();
     if (this.onChange) {
@@ -71,6 +71,14 @@ class I18N {
 
   constructor(locale, currency) {
     this.setLocale(locale, currency);
+  }
+
+  formatCurrency(value, alternateCurrency) {
+    const { locale, currency } = this;
+    return value.toLocaleString(locale, {
+      style: numberStyleCurrency,
+      currency: alternateCurrency || currency,
+    });
   }
 
   setLocalizers() {
@@ -157,7 +165,7 @@ export function addMessages(messageBundles) {
 
 const i18n = new I18N(defaultLocale, defaultCurrency);
 
-export const currency = (amount, currency) => i18n._localizers.c(amount, currency);
+export const formatCurrency = (value, currency) => i18n.formatCurrency(value, currency);
 
 export const setLocale = i18n.setLocale;
 export { i18n };
