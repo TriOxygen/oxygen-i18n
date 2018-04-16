@@ -27,6 +27,7 @@
   "author": "Özgür Ayten <ozgur.gene@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.26.0",
     "react": "^16.2.0"
   }
 }

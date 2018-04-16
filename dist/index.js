@@ -1,1 +1,4 @@
-import i18n from '../src/index';
+'use strict';
+
+require('babel-core/register');
+require('./example');

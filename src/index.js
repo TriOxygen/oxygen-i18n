@@ -7,8 +7,11 @@ const formatOption2Digit = '2-digit';
 const numberStyleDecimal = 'decimal';
 const numberStyleCurrency = 'currency';
 const numberStylePercent = 'percent';
-const defaultLocale = 'en-US';
-const defaultCurrency = 'EUR';
+const _localizers = {};
+let locale = 'en-US';
+let currency = 'EUR';
+let fallback = false;
+let onChange = null;
 
 const formatStrings = {
   d: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionNumeric, day: formatOptionNumeric, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
@@ -25,148 +28,145 @@ const formatStrings = {
   Y: { weekday: undefined, era: undefined, year: formatOptionNumeric, month: formatOptionLong, day: undefined, hour: undefined, minute: undefined, second: undefined, timeZoneName: undefined },
 };
 
-class I18N {
-  fallback = false;
-  currency = defaultCurrency;
 
-  translate = (literals, ...values) => {
-    const messageBundle = messages[this.locale];
-    const translationKey = this._buildKey(literals);
-    let translationString = messageBundle[translationKey];
+const _buildKey = (literals) => {
+  let stripType = s => s.replace(typeInfoRegex, '');
+  let lastPartialKey = stripType(literals[literals.length - 1]);
+  let prependPartialKey = (memo, curr, i) => `${stripType(curr)}{${i}}${memo}`;
 
-    if (this.fallback && !translationString) {
-      translationString = messages['en-US'][translationKey];
+  return literals.slice(0, -1).reduceRight(prependPartialKey, lastPartialKey).replace(/\r\n/g, '\n');
+};
+
+const _buildMessage = (str, ...values) => {
+  return str.replace(/{(\d)}/g, (_, index) => values[Number(index)]);
+};
+
+const _buildReact = (str, ...values) => {
+  const tokens = str.split(/({\d+})/).map(token => {
+    const match = token.match(/{(\d+)}/);
+    if (match) {
+      return values[Number(match[1])];
     }
-    if (translationString) {
-      let hasReact = false;
-      const typeInfoForValues = literals.slice(1).map(this._extractTypeInfo);
-      const localizedValues = values.map((v, i) => {
-        if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
-          hasReact = true;
-          return v;
-        } else if (typeof (v) === 'number' && typeInfoForValues[i].type == 's') {
-          if (typeof (v) == 'number') {
-            return this._localize(v, { type: 'n', options: '' });
-          }
-        }
-        return this._localize(v, typeInfoForValues[i])
-      });
-      if (hasReact) {
-        return this._buildReact(translationString, ...localizedValues);
-      }
-      return this._buildMessage(translationString, ...localizedValues);
-    }
-    return `${translationKey}[${this.locale}]`;
-  };
+    return token;
+  });
+  return React.createElement('span', {}, ...tokens);
+};
 
-  setLocale = (locale, currency) => {
-    this.locale = locale;
-    this.currency = this.currency || currency;
-    messages[locale] = messages[locale] || {};
-    this.setLocalizers();
-    if (this.onChange) {
-      this.onChange(locale, currency);
-    }
-  };
+const _localize = (value, { type, options }) => {
+  return _localizers[type](value, options);
+};
 
-  constructor(locale, currency) {
-    this.setLocale(locale, currency);
+const setLocalizers = () => {
+  _localizers.s = v => { // string
+    return (v || '').toLocaleString(locale);
   }
 
-  formatCurrency(value, alternateCurrency) {
-    const { locale, currency } = this;
-    return value.toLocaleString(locale, {
+  _localizers.c = (v, alternateCurrency) => {
+    return v.toLocaleString(locale, {
       style: numberStyleCurrency,
       currency: alternateCurrency || currency,
     });
   }
 
-  setLocalizers() {
-    const { locale, currency } = this;
-    this._localizers = {
-      s: v => { // string
-        return (v || '').toLocaleString(locale);
-      },
-      c: (v, alternateCurrency) => {
-        return v.toLocaleString(locale, {
-          style: numberStyleCurrency,
-          currency: alternateCurrency || currency,
-        });
-      },
-      n: (v, format) => {
-        return v.toLocaleString(locale, { style: numberStyleDecimal, minimumFractionDigits: 0, maximumFractionDigits: 3 });
-      },
-      t: (v, format) => {
-        if (format) {
-          switch (format.toUpperCase()) {
-            case 'R':
-              return v.toUTCString();
-            case 'O':
-              return v.toISOString();
-          }
-          const formatOptions = formatStrings[format];
-          if(formatOptions) {
-            return v.toLocaleString(locale, formatOptions);
-          }
-        }
-        return v.toLocaleString(locale, {});
-      },
-      p: (v) => {
-        return v.toLocaleString(locale, { style: numberStylePercent });
-      }
-
-    };
+  _localizers.n = (v, format) => {
+    return v.toLocaleString(locale, { style: numberStyleDecimal, minimumFractionDigits: 0, maximumFractionDigits: 3 });
   }
 
-  _extractTypeInfo(literal) {
-    const match = typeInfoRegex.exec(literal);
-    if (match) {
-      return { type: match[1], options: match[3] };
-    } else {
-      return { type: 's', options: '' };
+  _localizers.t = (v, format) => {
+    if (format) {
+      switch (format.toUpperCase()) {
+        case 'R':
+          return v.toUTCString();
+        case 'O':
+          return v.toISOString();
+      }
+      const formatOptions = formatStrings[format];
+      if(formatOptions) {
+        return v.toLocaleString(locale, formatOptions);
+      }
     }
+    return v.toLocaleString(locale, {});
   }
 
-  _localize(value, { type, options }) {
-    return this._localizers[type](value, options);
+  _localizers.p = (v) => {
+    return v.toLocaleString(locale, { style: numberStylePercent });
   }
+};
 
-  _buildKey(literals) {
-    let stripType = s => s.replace(typeInfoRegex, '');
-    let lastPartialKey = stripType(literals[literals.length - 1]);
-    let prependPartialKey = (memo, curr, i) => `${stripType(curr)}{${i}}${memo}`;
-
-    return literals.slice(0, -1).reduceRight(prependPartialKey, lastPartialKey).replace(/\r\n/g, '\n');
+const setLocale = (newLocale, newCurrency) => {
+  locale = newLocale;
+  currency = currency || newCurrency;
+  messages[locale] = messages[locale] || {};
+  setLocalizers();
+  if (onChange) {
+    onChange(locale, currency);
   }
+};
 
-  _buildMessage(str, ...values) {
-    return str.replace(/{(\d)}/g, (_, index) => values[Number(index)]);
+const formatCurrency = (value, alternateCurrency) => {
+  return value.toLocaleString(locale, {
+    style: numberStyleCurrency,
+    currency: alternateCurrency || currency,
+  });
+};
+
+const _extractTypeInfo = (literal) => {
+  const match = typeInfoRegex.exec(literal);
+  if (match) {
+    return { type: match[1], options: match[3] };
+  } else {
+    return { type: 's', options: '' };
   }
+};
 
-  _buildReact(str, ...values) {
-    const tokens = str.split(/({\d+})/).map(token => {
-      const match = token.match(/{(\d+)}/);
-      if (match) {
-        return values[Number(match[1])];
+const translate = (literals, ...values) => {
+  const messageBundle = messages[locale];
+  const translationKey = _buildKey(literals);
+  let translationString = messageBundle[translationKey];
+
+  if (fallback && !translationString) {
+    translationString = messages['en-US'][translationKey];
+  }
+  if (translationString) {
+    let hasReact = false;
+    const typeInfoForValues = literals.slice(1).map(_extractTypeInfo);
+    const localizedValues = values.map((v, i) => {
+      if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
+        hasReact = true;
+        return v;
+      } else if (typeof (v) === 'number' && typeInfoForValues[i].type == 's') {
+        if (typeof (v) == 'number') {
+          return _localize(v, { type: 'n', options: '' });
+        }
       }
-      return token;
+      return _localize(v, typeInfoForValues[i])
     });
-    return React.createElement('span', {}, ...tokens);
-
+    if (hasReact) {
+      return _buildReact(translationString, ...localizedValues);
+    }
+    return _buildMessage(translationString, ...localizedValues);
   }
-}
+  return `${translationKey}[${locale}]`;
+};
 
-export function addMessages(messageBundles) {
-  Object.keys(messageBundles).forEach(locale => {
-    messages[locale] = messages[locale] || {};
-    messages[locale] = Object.assign({}, messages[locale], messageBundles[locale]);
+const addMessages = (messageBundles) => {
+  Object.keys(messageBundles).forEach(key => {
+    messages[key] = messages[key] || {};
+    messages[key] = Object.assign({}, messages[key], messageBundles[key]);
   });
 }
 
-const i18n = new I18N(defaultLocale, defaultCurrency);
+const setOnChange = newOnchange => onChange = newOnchange;
+const setFallback = _fallback => fallback = _fallback;
 
-export const formatCurrency = (value, currency) => i18n.formatCurrency(value, currency);
+setLocale('en-US')
 
-export const setLocale = i18n.setLocale;
-export { i18n };
-export default i18n.translate;
+export const i18n = {
+  setLocale,
+  setOnChange,
+  addMessages,
+  formatCurrency,
+  setFallback,
+};
+
+export default translate;
