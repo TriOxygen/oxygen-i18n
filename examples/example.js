@@ -1,4 +1,7 @@
-import _l, { i18n } from '../src';
+import createTranslator from '../src';
+
+const i18n = createTranslator({});
+const _l = i18n.translate;
 
 i18n.addMessages({
   'en-US': {
@@ -6,8 +9,6 @@ i18n.addMessages({
     'Want some money? {0}': 'Want some money? {0}',
   }
 })
-
-
 
 const date = new Date();
 const money = 3123;
