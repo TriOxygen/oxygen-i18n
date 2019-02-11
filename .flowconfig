@@ -1,0 +1,16 @@
+[include]
+src
+
+[libs]
+flow-typed
+
+[lints]
+all=warn
+sketchy-null=off
+untyped-import=off
+
+[options]
+include_warnings=true
+module.ignore_non_literal_requires=true
+module.system.node.resolve_dirname=node_modules
+module.system.node.resolve_dirname=src
