@@ -1,4 +1,10 @@
 src
 examples
+dist
+.editorconfig
+.eslintrc.js
+.flowconfig
+package-lock.json
+yarn.lock
 .gitignore
 .babelrc
