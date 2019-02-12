@@ -1,5 +1,6 @@
 //@flow
 import React from 'react';
+import type { Token } from 'createTranslator';
 
 export default (str: string, ...values: Array<string>) => {
   const matchToken = (token) => {

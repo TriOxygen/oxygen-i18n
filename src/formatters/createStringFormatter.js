@@ -1,6 +1,8 @@
 //@flow
+import type { Token } from 'createTranslator';
 
-const createStringFormatter = () => (v?: string) => {
+// eslint-disable-next-line no-unused-vars
+const createStringFormatter = () => (v?: Token, _?: string) => {
   return (v || '').toLocaleString();
 };
 

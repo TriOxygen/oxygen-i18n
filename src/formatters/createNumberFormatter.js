@@ -1,22 +1,19 @@
 //@flow
+import type { Token, NumberOptions } from '../createTranslator';
 const numberStyleDecimal = 'decimal';
 
-type NumberOptions = {
-  style?: string,
-  minimumFractionDigits?: number,
-  maximumFractionDigits?: number,
-  [string]: string,
-};
+const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: Token, _?: string) => {
+  if (typeof v === 'number') {
+    const numberOptions = {
+      style: numberStyleDecimal,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 3,
+      ...options,
+    };
 
-const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: number) => {
-  const numberOptions = {
-    style: numberStyleDecimal,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
-    ...options,
-  };
-
-  return v.toLocaleString(locale, numberOptions);
+    return v.toLocaleString(locale, numberOptions);
+  }
+  return v.toString();
 };
 
 export default createNumberFormatter;

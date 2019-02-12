@@ -1,4 +1,5 @@
 //@flow
+import * as React from 'react';
 import buildKey from './buildKey';
 import buildReact from './buildReact';
 import buildMessage from './buildMessage';
@@ -9,23 +10,48 @@ import createPercentFormatter from './formatters/createPercentFormatter';
 import createStringFormatter from './formatters/createStringFormatter';
 import createDateFormatter from './formatters/createDateFormatter';
 
-type Options = {
+export type DateOptions = {
+  [string]: {
+    weekday?: string,
+    era?: string,
+    year?: string,
+    month?: string,
+    day?: string,
+    hour?: string,
+    minute?: string,
+    second?: string,
+    timeZoneName?: string,
+  },
+};
+
+export type PercentOptions = {
+  style?: string,
+  [string]: string,
+};
+
+export type NumberOptions = {
+  style?: string,
+  minimumFractionDigits?: number,
+  maximumFractionDigits?: number,
+  [string]: string,
+};
+
+export type CurrencyOptions = {
+  style?: string,
+  [string]: string,
+};
+
+export type Options = {
   fallback?: boolean,
   locale: string,
   currency: string,
   format: {
-    [string]: *,
+    currency?: CurrencyOptions,
+    date?: DateOptions,
+    number?: NumberOptions,
+    percent?: PercentOptions,
   },
 };
-
-const defaultOptions: Options = {
-  fallback: false,
-  locale: 'en-US',
-  currency: 'EUR',
-  format: {},
-};
-
-const messageStore = {};
 
 type MessageBundle = {
   [string]: {
@@ -36,6 +62,17 @@ type MessageBundle = {
 type MessageBundles = {
   [string]: MessageBundle,
 };
+
+export type Token = string | number | Date;
+
+const defaultOptions: Options = {
+  fallback: false,
+  locale: 'en-US',
+  currency: 'EUR',
+  format: {},
+};
+
+const messageStore = {};
 
 export const addMessages = (messageBundles: MessageBundles) => {
   Object.keys(messageBundles).forEach((key) => {
@@ -59,11 +96,11 @@ export default (options: Options = defaultOptions) => {
   _localizers.s = createStringFormatter();
   _localizers.t = createDateFormatter(locale, options.format.date);
 
-  const _localize = (value, { type, options }) => {
+  const _localize = (value: Token, { type, options }) => {
     return _localizers[type](value, options);
   };
 
-  const formatCurrency = (value, alternateCurrency) => {
+  const formatCurrency = (value: number, alternateCurrency: string) => {
     return value.toLocaleString(locale, {
       style: numberStyleCurrency,
       ...options.format.currency,
@@ -71,7 +108,7 @@ export default (options: Options = defaultOptions) => {
     });
   };
 
-  const translate = (literals, ...values) => {
+  const translate = (literals: Array<string>, ...values: Array<Token>): React.Node => {
     const translationKey = buildKey(literals);
     let translationString = messageStore[locale][translationKey];
 
@@ -84,7 +121,7 @@ export default (options: Options = defaultOptions) => {
       const localizedValues = values.map((v, i) => {
         if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
           hasReact = true;
-          return v;
+          return v.toString();
         } else if (typeof v === 'number' && typeInfoForValues[i].type === 's') {
           if (typeof v === 'number') {
             return _localize(v, { type: 'n', options: '' });

@@ -1,9 +1,11 @@
 //@flow
+import type { DateOptions, Token } from '../createTranslator';
+
 const formatOptionNumeric = 'numeric';
 const formatOptionLong = 'long';
 const formatOption2Digit = '2-digit';
 
-const formatStrings = {
+const formatStrings: DateOptions = {
   d: {
     weekday: undefined,
     era: undefined,
@@ -138,21 +140,7 @@ const formatStrings = {
   },
 };
 
-type DateOptions = {
-  [string]: {
-    weekday?: string,
-    era?: string,
-    year?: string,
-    month?: string,
-    day?: string,
-    hour?: string,
-    minute?: string,
-    second?: string,
-    timeZoneName?: string,
-  },
-};
-
-const createDateFormatter = (locale: string, currency: string, options: DateOptions = {}) => {
+const createDateFormatter = (locale: string, options?: DateOptions = {}) => {
   const dateOptions = {
     ...formatStrings,
   };
@@ -163,17 +151,20 @@ const createDateFormatter = (locale: string, currency: string, options: DateOpti
     };
   });
 
-  return (v: Date, format: string) => {
-    if (format) {
-      const ucFormat = format.toUpperCase();
-      if (ucFormat === 'R') return v.toUTCString();
-      if (ucFormat === 'O') return v.toISOString();
-      const formatOptions = dateOptions[format];
-      if (formatOptions) {
-        return v.toLocaleString(locale, dateOptions);
+  return (v: Token, format: string) => {
+    if (typeof v === 'object') {
+      if (format) {
+        const ucFormat = format.toUpperCase();
+        if (ucFormat === 'R') return v.toUTCString();
+        if (ucFormat === 'O') return v.toISOString();
+        const formatOptions = dateOptions[format];
+        if (formatOptions) {
+          return v.toLocaleString(locale, dateOptions);
+        }
       }
+      return v.toLocaleString(locale, {});
     }
-    return v.toLocaleString(locale, {});
+    return v.toString();
   };
 };
 

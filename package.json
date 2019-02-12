@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rimraf lib && rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:flow": "flow gen-flow-files ./src --out-dir ./lib",
     "build": "yarn clean && babel ./src --out-dir ./lib && yarn build:flow",
+    "build:flow": "flow-copy-source -v -i '**/__tests__/**' src lib",
     "build:examples": "babel ./examples --out-dir ./dist"
   },
   "repository": {
@@ -29,12 +29,13 @@
     "eslint": "^5.13.0",
     "eslint-plugin-flowtype": "^3.2.1",
     "eslint-plugin-prettier": "^3.0.1",
-    "prettier": "^1.16.4"
+    "flow-copy-source": "^2.0.2",
+    "prettier": "^1.16.4",
+    "rimraf": "^2.6.3"
   },
   "author": "Özgür Ayten <oz@gur.space>",
   "license": "ISC",
   "dependencies": {
-    "react": "^16.8.1",
-    "rimraf": "^2.6.3"
+    "react": "^16.8.1"
   }
 }

@@ -1,23 +1,22 @@
 //@flow
+import type { Token, CurrencyOptions } from '../createTranslator';
 const numberStyleCurrency = 'currency';
 
-type CurrencyOptions = {
-  style?: string,
-  [string]: string,
-};
-
 const createCurrencyFormatter = (locale: string, currency: string, options?: CurrencyOptions = {}) => (
-  v: number,
+  v: Token,
   alternateCurrency: string
 ) => {
-  const currencyOptions = {
-    style: numberStyleCurrency,
-    ...options,
-  };
-  return v.toLocaleString(locale, {
-    ...currencyOptions,
-    currency: alternateCurrency || currency,
-  });
+  if (typeof v === 'number') {
+    const currencyOptions = {
+      style: numberStyleCurrency,
+      ...options,
+    };
+    return v.toLocaleString(locale, {
+      ...currencyOptions,
+      currency: alternateCurrency || currency,
+    });
+  }
+  return v.toString();
 };
 
 export default createCurrencyFormatter;
