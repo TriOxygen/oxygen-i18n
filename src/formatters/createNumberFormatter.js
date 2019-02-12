@@ -2,6 +2,7 @@
 import type { Token, NumberOptions } from '../createTranslator';
 const numberStyleDecimal = 'decimal';
 
+// eslint-disable-next-line no-unused-vars
 const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: Token, _?: string) => {
   if (typeof v === 'number') {
     const numberOptions = {
