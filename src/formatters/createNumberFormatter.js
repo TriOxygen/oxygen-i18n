@@ -1,6 +1,14 @@
+//@flow
 const numberStyleDecimal = 'decimal';
 
-const createNumberFormatter = (locale, currency, options = {}) => (v, format) => {
+type NumberOptions = {
+  style?: string,
+  minimumFractionDigits?: number,
+  maximumFractionDigits?: number,
+  [string]: string,
+};
+
+const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: number) => {
   const numberOptions = {
     style: numberStyleDecimal,
     minimumFractionDigits: 0,

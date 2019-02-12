@@ -138,7 +138,21 @@ const formatStrings = {
   },
 };
 
-const createDateFormatter = (locale, currency, options = {}) => {
+type DateOptions = {
+  [string]: {
+    weekday?: string,
+    era?: string,
+    year?: string,
+    month?: string,
+    day?: string,
+    hour?: string,
+    minute?: string,
+    second?: string,
+    timeZoneName?: string,
+  },
+};
+
+const createDateFormatter = (locale: string, currency: string, options: DateOptions = {}) => {
   const dateOptions = {
     ...formatStrings,
   };
@@ -149,7 +163,7 @@ const createDateFormatter = (locale, currency, options = {}) => {
     };
   });
 
-  return (v, format) => {
+  return (v: Date, format: string) => {
     if (format) {
       const ucFormat = format.toUpperCase();
       if (ucFormat === 'R') return v.toUTCString();

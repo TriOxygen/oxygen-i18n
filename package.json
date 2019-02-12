@@ -4,9 +4,11 @@
   "description": "",
   "main": "lib/index.js",
   "scripts": {
+    "clean": "rimraf lib && rimraf dist",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel ./src --out-dir ./lib",
-    "build-examples": "babel ./examples --out-dir ./dist"
+    "build:flow": "flow gen-flow-files ./src --out-dir ./lib",
+    "build": "yarn clean && babel ./src --out-dir ./lib && yarn build:flow",
+    "build:examples": "babel ./examples --out-dir ./dist"
   },
   "repository": {
     "type": "git",
@@ -32,6 +34,7 @@
   "author": "Özgür Ayten <oz@gur.space>",
   "license": "ISC",
   "dependencies": {
-    "react": "^16.8.1"
+    "react": "^16.8.1",
+    "rimraf": "^2.6.3"
   }
 }

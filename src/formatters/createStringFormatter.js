@@ -1,8 +1,7 @@
 //@flow
 
-const createNumberFormatter = (locale) => (v) => {
-  // string
-  return (v || '').toLocaleString(locale);
+const createStringFormatter = () => (v?: string) => {
+  return (v || '').toLocaleString();
 };
 
-export default createNumberFormatter;
+export default createStringFormatter;

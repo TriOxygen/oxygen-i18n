@@ -9,7 +9,16 @@ import createPercentFormatter from './formatters/createPercentFormatter';
 import createStringFormatter from './formatters/createStringFormatter';
 import createDateFormatter from './formatters/createDateFormatter';
 
-const defaultOptions = {
+type Options = {
+  fallback?: boolean,
+  locale: string,
+  currency: string,
+  format: {
+    [string]: *,
+  },
+};
+
+const defaultOptions: Options = {
   fallback: false,
   locale: 'en-US',
   currency: 'EUR',
@@ -18,7 +27,17 @@ const defaultOptions = {
 
 const messageStore = {};
 
-export const addMessages = (messageBundles) => {
+type MessageBundle = {
+  [string]: {
+    [string]: string,
+  },
+};
+
+type MessageBundles = {
+  [string]: MessageBundle,
+};
+
+export const addMessages = (messageBundles: MessageBundles) => {
   Object.keys(messageBundles).forEach((key) => {
     messageStore[key] = messageStore[key] || {};
     messageStore[key] = {
@@ -28,7 +47,7 @@ export const addMessages = (messageBundles) => {
   });
 };
 
-export default (options = defaultOptions) => {
+export default (options: Options = defaultOptions) => {
   const numberStyleCurrency = 'currency';
   const _localizers = {};
   const { locale, currency } = options;
@@ -37,7 +56,7 @@ export default (options = defaultOptions) => {
   _localizers.c = createCurrencyFormatter(locale, currency, options.format.currency);
   _localizers.n = createNumberFormatter(locale, options.format.number);
   _localizers.p = createPercentFormatter(locale, options.format.percent);
-  _localizers.s = createStringFormatter(locale);
+  _localizers.s = createStringFormatter();
   _localizers.t = createDateFormatter(locale, options.format.date);
 
   const _localize = (value, { type, options }) => {

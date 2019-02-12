@@ -1,6 +1,12 @@
+//@flow
 const numberStylePercent = 'percent';
 
-const createNumberFormatter = (locale, currency, options = {}) => (v, format) => {
+type PercentOptions = {
+  style?: string,
+  [string]: string,
+};
+
+const createPercentFormatter = (locale: string, options: PercentOptions = {}) => (v: number) => {
   const percentOptions = {
     style: numberStylePercent,
     ...options,
@@ -9,4 +15,4 @@ const createNumberFormatter = (locale, currency, options = {}) => (v, format) =>
   return v.toLocaleString(locale, percentOptions);
 };
 
-export default createNumberFormatter;
+export default createPercentFormatter;

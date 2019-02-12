@@ -1,6 +1,15 @@
+//@flow
 const numberStyleCurrency = 'currency';
 
-const createCurrencyFormatter = (locale, currency, options = {}) => (v, alternateCurrency) => {
+type CurrencyOptions = {
+  style?: string,
+  [string]: string,
+};
+
+const createCurrencyFormatter = (locale: string, currency: string, options?: CurrencyOptions = {}) => (
+  v: number,
+  alternateCurrency: string
+) => {
   const currencyOptions = {
     style: numberStyleCurrency,
     ...options,

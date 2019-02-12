@@ -7,11 +7,9 @@ module.exports = {
     jest: true,
     mocha: true,
   },
-  extends: [
-    'plugin:flowtype/recommended',
-  ],
+  extends: ['plugin:flowtype/recommended'],
   parser: 'babel-eslint',
-  plugins: [ 'prettier', 'flowtype'],
+  plugins: ['prettier', 'flowtype'],
   settings: {
     'import/resolver': {
       node: {
@@ -28,7 +26,6 @@ module.exports = {
     'import/no-unassigned-import': 0,
     'import/no-named-as-default-member': 0,
     'prettier/prettier': 'error',
-    ],
   },
   globals: {
     addTranslations: true,

@@ -1,7 +1,7 @@
 //@flow
 import React from 'react';
 
-export default (str, ...values) => {
+export default (str: string, ...values: Array<string>) => {
   const matchToken = (token) => {
     const match = token.match(/{(\d+)}/);
     if (match) {
