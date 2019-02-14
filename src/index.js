@@ -16,10 +16,10 @@ const defaultOptions: Options = {
 export default (options: Options = defaultOptions) => {
   const _options = {
     ...defaultOptions,
-    options,
+    ...options,
     format: {
       ...defaultOptions.format,
-      ...options.format,
+      ...(options.format || {}),
     },
   };
   const { locale, currency } = _options;

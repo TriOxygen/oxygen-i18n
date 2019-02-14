@@ -54,9 +54,7 @@ export type Options = {
 };
 
 type MessageBundle = {
-  [string]: {
-    [string]: string,
-  },
+  [string]: string,
 };
 
 type MessageBundles = {
@@ -110,8 +108,7 @@ export default (options: Options = defaultOptions) => {
 
   const translate = (literals: Array<string>, ...values: Array<Token>): React.Node => {
     const translationKey = buildKey(literals);
-    let translationString = messageStore[locale][translationKey];
-
+    let translationString = translationKey === '{0}' ? translationKey : messageStore[locale][translationKey];
     if (options.fallback && !translationString) {
       translationString = messageStore['en-US'][translationKey];
     }
@@ -121,7 +118,7 @@ export default (options: Options = defaultOptions) => {
       const localizedValues = values.map((v, i) => {
         if (typeInfoForValues[i].type === 's' && typeof v === 'object') {
           hasReact = true;
-          return v.toString();
+          return v;
         } else if (typeof v === 'number' && typeInfoForValues[i].type === 's') {
           if (typeof v === 'number') {
             return _localize(v, { type: 'n', options: '' });
