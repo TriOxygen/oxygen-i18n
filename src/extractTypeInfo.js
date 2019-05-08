@@ -6,5 +6,5 @@ export default (literal: string) => {
   if (match) {
     return { type: match[1], options: match[3] };
   }
-  return { type: 's', options: '' };
+  return { type: "s", options: "" };
 };

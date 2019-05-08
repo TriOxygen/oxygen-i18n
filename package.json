@@ -1,6 +1,6 @@
 {
   "name": "oxygen-i18n",
-  "version": "3.3.4",
+  "version": "3.4.3",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
@@ -35,7 +35,7 @@
   },
   "author": "Özgür Ayten <oz@gur.space>",
   "license": "ISC",
-  "dependencies": {
-    "react": "^16.8.1"
+  "peerDependencies": {
+    "react": "^16.8.3"
   }
 }

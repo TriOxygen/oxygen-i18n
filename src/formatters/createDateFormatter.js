@@ -159,7 +159,7 @@ const createDateFormatter = (locale: string, options?: DateOptions = {}) => {
         if (ucFormat === 'O') return v.toISOString();
         const formatOptions = dateOptions[format];
         if (formatOptions) {
-          return v.toLocaleString(locale, dateOptions);
+          return v.toLocaleString(locale, formatOptions);
         }
       }
       return v.toLocaleString(locale, {});
