@@ -1,16 +1,13 @@
-//@flow
-
-import createTranslator from './createTranslator';
-import type { Options } from './createTranslator';
+import createTranslator, { Options } from './createTranslator';
 export { addMessages } from './createTranslator';
 
-const cache = {};
+const cache: Record<string, Record<string, ReturnType<typeof createTranslator>>> = {};
 
 const defaultOptions: Options = {
   fallback: false,
   locale: 'en-US',
   currency: 'EUR',
-  format: {},
+  format: {}
 };
 
 export default (options: Options = defaultOptions) => {
@@ -19,8 +16,8 @@ export default (options: Options = defaultOptions) => {
     ...options,
     format: {
       ...defaultOptions.format,
-      ...(options.format || {}),
-    },
+      ...(options.format || {})
+    }
   };
   const { locale, currency } = _options;
   if (!cache[locale]) {

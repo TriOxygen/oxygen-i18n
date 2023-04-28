@@ -1,19 +1,18 @@
-//@flow
-import type { Token, CurrencyOptions } from '../createTranslator';
+import type { CurrencyOptions, Token } from '../createTranslator';
 const numberStyleCurrency = 'currency';
 
-const createCurrencyFormatter = (locale: string, currency: string, options?: CurrencyOptions = {}) => (
+const createCurrencyFormatter = (locale: string, currency: string, options: CurrencyOptions = {}) => (
   v: Token,
-  alternateCurrency: string
+  format?: string
 ) => {
   if (typeof v === 'number') {
     const currencyOptions = {
       style: numberStyleCurrency,
-      ...options,
+      ...options
     };
     return v.toLocaleString(locale, {
       ...currencyOptions,
-      currency: alternateCurrency || currency,
+      currency: format || currency
     });
   }
   return v.toString();

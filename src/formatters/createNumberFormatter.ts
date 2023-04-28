@@ -1,15 +1,13 @@
-//@flow
-import type { Token, NumberOptions } from '../createTranslator';
+import type { NumberOptions, Token } from '../createTranslator';
 const numberStyleDecimal = 'decimal';
 
-// eslint-disable-next-line no-unused-vars
-const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: Token, _?: string) => {
+const createNumberFormatter = (locale: string, options: NumberOptions = {}) => (v: Token, _format?: string) => {
   if (typeof v === 'number') {
     const numberOptions = {
       style: numberStyleDecimal,
       minimumFractionDigits: 0,
       maximumFractionDigits: 3,
-      ...options,
+      ...options
     };
 
     return v.toLocaleString(locale, numberOptions);

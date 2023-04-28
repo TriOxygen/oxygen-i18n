@@ -1,10 +1,9 @@
-//@flow
 const typeInfoRegex = /^:([a-z])(\(([^)]+)\))?/;
 
-export default (literals: Array<string>) => {
-  const stripType = (s) => s.replace(typeInfoRegex, '');
+export default (literals: TemplateStringsArray) => {
+  const stripType = (s: string) => s.replace(typeInfoRegex, '');
   const lastPartialKey = stripType(literals[literals.length - 1]);
-  const prependPartialKey = (memo, curr, i) => `${stripType(curr)}{${i}}${memo}`;
+  const prependPartialKey = (memo:string, curr: string, i: number) => `${stripType(curr)}{${i}}${memo}`;
 
   return literals
     .slice(0, -1)

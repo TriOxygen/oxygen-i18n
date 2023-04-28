@@ -1,4 +1,3 @@
-//@flow
 import type { DateOptions, Token } from '../createTranslator';
 
 const formatOptionNumeric = 'numeric';
@@ -15,7 +14,7 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   D: {
     weekday: formatOptionLong,
@@ -26,7 +25,7 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   f: {
     weekday: formatOptionLong,
@@ -37,7 +36,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   F: {
     weekday: formatOptionLong,
@@ -48,7 +47,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: formatOption2Digit,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   g: {
     weekday: undefined,
@@ -59,7 +58,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   G: {
     weekday: undefined,
@@ -70,7 +69,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: formatOption2Digit,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   m: {
     weekday: undefined,
@@ -81,7 +80,7 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   M: {
     weekday: undefined,
@@ -92,7 +91,7 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   t: {
     weekday: undefined,
@@ -103,7 +102,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   T: {
     weekday: undefined,
@@ -114,7 +113,7 @@ const formatStrings: DateOptions = {
     hour: formatOptionNumeric,
     minute: formatOption2Digit,
     second: formatOption2Digit,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   y: {
     weekday: undefined,
@@ -125,7 +124,7 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
+    timeZoneName: undefined
   },
   Y: {
     weekday: undefined,
@@ -136,22 +135,22 @@ const formatStrings: DateOptions = {
     hour: undefined,
     minute: undefined,
     second: undefined,
-    timeZoneName: undefined,
-  },
+    timeZoneName: undefined
+  }
 };
 
-const createDateFormatter = (locale: string, options?: DateOptions = {}) => {
+const createDateFormatter = (locale: string, options: DateOptions = {}) => {
   const dateOptions = {
-    ...formatStrings,
+    ...formatStrings
   };
-  Object.keys(options).forEach((format) => {
+  (Object.keys(options) as (keyof DateOptions)[]).forEach((format: keyof DateOptions) => {
     dateOptions[format] = {
       ...dateOptions[format],
-      ...options[format],
+      ...options[format]
     };
   });
 
-  return (v: Token, format: string) => {
+  return (v: Token, format?: keyof DateOptions) => {
     if (typeof v === 'object') {
       if (format) {
         const ucFormat = format.toUpperCase();

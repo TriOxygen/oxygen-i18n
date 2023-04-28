@@ -1,14 +1,11 @@
 {
   "name": "oxygen-i18n",
-  "version": "3.4.3",
+  "version": "4.1.0",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib && rimraf dist",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "yarn clean && babel ./src --out-dir ./lib && yarn build:flow",
-    "build:flow": "flow-copy-source -v -i '**/__tests__/**' src lib",
-    "build:examples": "babel ./examples --out-dir ./dist"
+    "build": "rimraf lib && rimraf dist && tsc"
   },
   "repository": {
     "type": "git",
@@ -19,23 +16,20 @@
   },
   "homepage": "https://github.com/TriOxygen/oxygen-i18n#readme",
   "devDependencies": {
-    "@babel/cli": "^7.2.0",
-    "@babel/core": "^7.2.0",
-    "@babel/preset-env": "^7.2.0",
-    "@babel/preset-flow": "^7.0.0",
-    "@babel/register": "^7.0.0",
-    "@babel/runtime": "^7.3.1",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.13.0",
-    "eslint-plugin-flowtype": "^3.2.1",
-    "eslint-plugin-prettier": "^3.0.1",
-    "flow-copy-source": "^2.0.2",
-    "prettier": "^1.16.4",
-    "rimraf": "^2.6.3"
+    "@typescript-eslint/eslint-plugin": "^5.55.0",
+    "@typescript-eslint/parser": "^5.55.0",
+    "eslint": "^8.36.0",
+    "eslint-config-prettier": "^8.7.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.6.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "rimraf": "^5.0.0",
+    "typescript": "^5.0.3"
   },
   "author": "Özgür Ayten <oz@gur.space>",
-  "license": "ISC",
-  "peerDependencies": {
-    "react": "^16.8.3"
-  }
+  "license": "ISC"
 }
