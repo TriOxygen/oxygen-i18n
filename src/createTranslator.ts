@@ -18,6 +18,8 @@ export interface DateOptions {
   m?: Intl.DateTimeFormatOptions;
   t?: Intl.DateTimeFormatOptions;
   T?: Intl.DateTimeFormatOptions;
+  w?: Intl.DateTimeFormatOptions;
+  W?: Intl.DateTimeFormatOptions;
   y?: Intl.DateTimeFormatOptions;
   Y?: Intl.DateTimeFormatOptions;
 }

@@ -89,6 +89,28 @@ const formatStrings: DateOptions = {
     second: undefined,
     timeZoneName: undefined
   },
+  w: {
+    weekday: 'long',
+    era: undefined,
+    year: undefined,
+    month: 'numeric',
+    day: 'numeric',
+    hour: undefined,
+    minute: undefined,
+    second: undefined,
+    timeZoneName: undefined
+  },
+  W: {
+    weekday: 'long',
+    era: undefined,
+    year: undefined,
+    month: 'long',
+    day: 'numeric',
+    hour: undefined,
+    minute: undefined,
+    second: undefined,
+    timeZoneName: undefined
+  },
   t: {
     weekday: undefined,
     era: undefined,
